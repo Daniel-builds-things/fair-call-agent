@@ -23,7 +23,7 @@ Fair Call Pro's deterministic LRU (Least Recently Used) scheduler distributes sh
 ### Our Agent Solution
 We built a three-agent system that sits on top of the LRU scheduler:
 
-1. **Constraint Parser** — Converts natural language instructions into 14 types of structured constraints (time-off, availability, shift preferences, inter-staff conflicts, workload limits) using pattern matching — zero LLM calls, zero external dependencies.
+1. **Constraint Parser** — Converts natural language instructions into 14 types of structured constraints (time-off, availability, shift preferences, inter-staff conflicts, workload limits) using an LLM (Groq) for semantic understanding, with regex fallback when no API key is configured.
 2. **Constraint-Aware Scheduler** — Wraps the LRU algorithm with hard-constraint filtering and soft-constraint scoring. It pre-pins specific shifts, filters ineligible staff, scores soft preferences, and gracefully degrades when understaffed.
 3. **Schedule Explainer** — Analyzes the output for fairness (Gini-like score), constraint compliance, anomalies, and generates actionable insights including a "hot take" from the failure analysis.
 
@@ -40,7 +40,7 @@ Across 12 realistic evaluation cases:
 > Back-to-back violations increase slightly (+3) when honoring time-off constraints in understaffed teams — because removing one person forces others to work consecutive days. Constraint satisfaction and individual workload smoothness are sometimes at odds. The agent's job isn't to eliminate all violations but to make transparent, principled trade-offs that the baseline can't even consider.
 
 ### Tech Stack
-TypeScript, date-fns, pure pattern-matching (no LLM API calls). Built on [Fair Call Pro](https://github.com/veelawrence07-ui/fair-call-pro).
+TypeScript, date-fns, groq-sdk (LLM-powered constraint parsing with regex fallback). Built on [Fair Call Pro](https://github.com/Danielbuildsorigin/fair-call-pro).
 
 ---
 

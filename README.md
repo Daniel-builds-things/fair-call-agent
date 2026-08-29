@@ -1,6 +1,6 @@
 # Fair Call Agent — Agentic Shift Scheduling
 
-> **micro1 Agentic Workflows Hackathon** — Built on [Fair Call Pro](https://github.com/veelawrence07-ui/fair-call-pro)
+> **micro1 Agentic Workflows Hackathon** — Built on [Fair Call Pro](https://github.com/Danielbuildsorigin/fair-call-pro)
 
 An agentic constraint-reasoning layer on top of a deterministic LRU scheduler. Managers give natural language instructions; the agent parses, reasons about trade-offs, and produces schedules that honor constraints.
 
@@ -141,7 +141,7 @@ console.log(explanation.hotTake); // "Key insight..."
 
 ## Built On
 
-- [Fair Call Pro](https://github.com/veelawrence07-ui/fair-call-pro) — React/Vite/TypeScript shift scheduling app with LRU algorithm
+- [Fair Call Pro](https://github.com/Danielbuildsorigin/fair-call-pro) — React/Vite/TypeScript shift scheduling app with LRU algorithm
 - date-fns — Date manipulation
 - TypeScript — Type safety throughout
 
