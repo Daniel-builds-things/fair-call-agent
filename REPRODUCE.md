@@ -21,7 +21,7 @@ The entire project runs locally with no API keys, no Supabase, no cloud services
 ## Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/veelawrence07-ui/fair-call-agent.git
+git clone https://github.com/Daniel-builds-things/fair-call-agent.git
 cd fair-call-agent
 ```
 
