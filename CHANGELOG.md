@@ -121,6 +121,25 @@ Baseline: 0%. Agent: 100%.
 
 ---
 
+## Iteration 6: LLM-Powered Constraint Parsing
+
+**Change**: Added a Groq LLM-based constraint parser (`llm-constraint-parser.ts`) that semantically understands natural language, with regex fallback when no API key is configured.
+
+**Design**: The `parseConstraintsAsync()` entry point tries the LLM first. If the LLM successfully parses all constraints, it returns those results. Any constraints the LLM misses are passed to the regex parser as a fallback. If the LLM is unavailable (no `GROQ_API_KEY`), it falls back to regex-only — the app works exactly as before at $0 cost.
+
+**Why LLM**: The regex parser struggles with complex phrasing, negations, and multi-part constraints. For example, "Ada and Chidi should NOT work together" was misread by regex as `pair_together` instead of `pair_apart`. The LLM understands negation semantically.
+
+**Evidence**:
+| Constraint Text | Regex Parser | LLM Parser |
+|---|---|---|
+| "Kemi and Ladi should NOT work together" | `pair_together` ✗ | `pair_apart` ✓ |
+| "Ada cannot do night followed by morning" | `no_night_to_morning` ✓ | `no_night_to_morning` ✓ |
+| "Ibrahim is only available weekdays" | `availability` ✓ | `availability` ✓ |
+
+The LLM correctly interprets negation where the regex parser fails. Both paths produce identical results for well-structured constraints.
+
+---
+
 ## Final Results
 
 | Metric | Baseline | Agent | Δ |

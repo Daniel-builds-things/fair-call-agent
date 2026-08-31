@@ -33,11 +33,14 @@ No API keys, no external services — pure TypeScript.
 | Component | File | Purpose |
 |---|---|---|
 | Baseline Scheduler | `src/lib/baseline-scheduler.ts` | Original LRU algorithm from Fair Call Pro |
-| Constraint Parser | `src/agents/constraint-parser.ts` | Natural language → structured constraints |
+| Constraint Parser | `src/agents/constraint-parser.ts` | Natural language → structured constraints (regex) |
+| LLM Constraint Parser | `src/agents/llm-constraint-parser.ts` | Groq LLM-powered semantic parsing |
 | Enhanced Scheduler | `src/agents/enhanced-scheduler.ts` | Constraint-aware scheduling engine |
 | Schedule Explainer | `src/agents/schedule-explainer.ts` | Fairness analysis + insights + hot take |
 | Evaluation Suite | `src/eval/evaluate.ts` | 12-case benchmark: baseline vs agent |
 | Test Cases | `src/eval/cases.ts` | Realistic scenarios with constraints |
+| **Web UI** | `app/page.tsx` | Interactive live scheduler demo |
+| **API Route** | `app/api/schedule/route.ts` | REST endpoint for schedule generation |
 
 ### Supported Constraint Types
 
@@ -91,7 +94,8 @@ fair-call-agent/
 │   ├── lib/
 │   │   └── baseline-scheduler.ts   # Original LRU (our baseline)
 │   ├── agents/
-│   │   ├── constraint-parser.ts     # NL → constraints
+│   │   ├── constraint-parser.ts     # NL → constraints (regex)
+│   │   ├── llm-constraint-parser.ts # NL → constraints (Groq LLM)
 │   │   ├── enhanced-scheduler.ts    # Constraint-aware engine
 │   │   └── schedule-explainer.ts    # Analysis + insights
 │   ├── eval/
@@ -99,12 +103,23 @@ fair-call-agent/
 │   │   └── evaluate.ts              # Benchmark runner
 │   ├── types.ts                     # Shared type definitions
 │   └── index.ts                     # Demo entry point
+├── app/                             # Next.js web UI
+│   ├── page.tsx                     # Interactive scheduler UI
+│   ├── layout.tsx                   # Root layout
+│   └── api/schedule/route.ts        # REST API for scheduling
+├── scheduler-lib/                   # Web-app copies (ESM-compatible)
+│   ├── baseline-scheduler.ts
+│   ├── constraint-parser.ts
+│   ├── llm-constraint-parser.ts
+│   ├── enhanced-scheduler.ts
+│   └── types.ts
 ├── scripts/
 │   └── generate_eval_html.ts        # HTML report generator
 ├── eval-report/
 │   └── index.html                   # Visual evaluation report
 ├── CHANGELOG.md                     # Iterative improvement log
 ├── package.json
+├── next.config.mjs                  # Next.js configuration
 └── tsconfig.json
 ```
 
@@ -142,6 +157,8 @@ console.log(explanation.hotTake); // "Key insight..."
 ## Built On
 
 - [Fair Call Pro](https://github.com/Danielbuildsorigin/fair-call-pro) — React/Vite/TypeScript shift scheduling app with LRU algorithm
+- [Groq](https://groq.com) — LLM-powered constraint parsing (`groq-sdk`)
+- [Next.js](https://nextjs.org) — Web UI framework (app router)
 - date-fns — Date manipulation
 - TypeScript — Type safety throughout
 

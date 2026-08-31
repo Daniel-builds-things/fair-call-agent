@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { parseConstraints } from "../../../scheduler-lib/constraint-parser";
+import { parseConstraintsAsync, isLLMAvailable } from "../../../scheduler-lib/constraint-parser";
 import { generateAgentSchedule } from "../../../scheduler-lib/enhanced-scheduler";
 
 export async function POST(req: NextRequest) {
@@ -22,8 +22,8 @@ export async function POST(req: NextRequest) {
       endDate: s.endDate ? new Date(s.endDate) : undefined,
     }));
 
-    // Parse constraints
-    const parsed = parseConstraints(constraintTexts || [], staffWithDates, monthDate);
+    // Parse constraints — LLM first, regex fallback
+    const parsed = await parseConstraintsAsync(constraintTexts || [], staffWithDates, monthDate);
 
     // Generate schedule
     const schedule = generateAgentSchedule(
@@ -53,6 +53,7 @@ export async function POST(req: NextRequest) {
       constraintDecisions: schedule.constraintDecisions,
       parsedConstraints: parsed.constraints,
       unrecognizedConstraints: parsed.unrecognized,
+      llmPowered: isLLMAvailable(),
     });
   } catch (err: any) {
     console.error("Schedule generation error:", err);

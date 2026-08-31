@@ -13,6 +13,7 @@ import {
   getDay,
 } from "date-fns";
 import type { Constraint, ConstraintType, ConstraintPriority, StaffMember } from "./types";
+import { parseConstraintsWithLLM, isLLMAvailable } from "./llm-constraint-parser";
 
 let constraintCounter = 0;
 function nextId(): string {
@@ -691,3 +692,46 @@ function parseRole(
     sourceText: text,
   };
 }
+
+// ─── Async LLM-Aware Entry Point ──────────────────────────────────────────────
+
+/**
+ * Parse constraints with LLM first, regex fallback.
+ * This is the recommended entry point for production use.
+ */
+export async function parseConstraintsAsync(
+  requests: string[],
+  staff: StaffMember[],
+  month: Date
+): Promise<ParseResult> {
+  // Try LLM parser first if API key is configured
+  if (isLLMAvailable()) {
+    try {
+      const llmConstraints = await parseConstraintsWithLLM(requests, staff, month);
+      if (llmConstraints.length > 0) {
+        // Check if LLM parsed everything; fall back for any missed
+        const llmSourceTexts = new Set(llmConstraints.map((c) => c.sourceText));
+        const missed = requests.filter((r) => r.trim() && !llmSourceTexts.has(r.trim()));
+        if (missed.length === 0) {
+          return { constraints: llmConstraints, unrecognized: [] };
+        }
+        // LLM missed some — parse those with regex
+        const regexResult = parseConstraints(missed, staff, month);
+        return {
+          constraints: [...llmConstraints, ...regexResult.constraints],
+          unrecognized: regexResult.unrecognized,
+        };
+      }
+    } catch (err) {
+      console.warn("[LLM Parser] Error, falling back to regex:", err);
+    }
+  }
+
+  // Fallback to regex parser
+  return parseConstraints(requests, staff, month);
+}
+
+/**
+ * Check if LLM parsing is available.
+ */
+export { isLLMAvailable };

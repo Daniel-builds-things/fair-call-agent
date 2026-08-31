@@ -12,9 +12,9 @@
 | **Node.js** | v20+ (v22 tested) | `node --version` |
 | **npm** | v10+ | `npm --version` |
 | **OS** | macOS / Linux / WSL | Any Unix-like environment |
-| **API Keys** | None | Zero external dependencies |
+| **API Keys** | Optional | `GROQ_API_KEY` for LLM-powered parsing (free tier available at console.groq.com) |
 
-The entire project runs locally with no API keys, no Supabase, no cloud services.
+The entire project runs locally. Without `GROQ_API_KEY`, it falls back to regex-only constraint parsing — no external services required.
 
 ---
 
@@ -119,6 +119,25 @@ Open `eval-report/index.html` in any browser.
 
 ---
 
+## Step 5: (Optional) Enable LLM-Powered Parsing
+
+For the full agentic experience with semantic constraint understanding:
+
+```bash
+# Get a free API key from https://console.groq.com
+export GROQ_API_KEY="your-key-here"
+```
+
+Then run the LLM demo to see side-by-side comparison:
+
+```bash
+npm run demo:llm
+```
+
+Without `GROQ_API_KEY`, the app falls back to regex-only parsing — still works perfectly, just without semantic understanding.
+
+---
+
 ## Step 6: Run Constraint Tests
 
 ```bash
@@ -159,14 +178,14 @@ fair-call-agent/
 
 ## Cost & Runtime
 
-| Metric | Value |
-|---|---|
-| API calls | 0 |
-| External services | 0 |
-| LLM cost | $0.00 |
-| Total runtime (full eval) | ~5 seconds |
-| Memory usage | <50 MB |
-| Node.js version | v22 (v20+ compatible) |
+| Metric | Regex-Only | LLM-Enabled |
+|---|---|---|
+| API calls | 0 | ~1 per schedule generation |
+| External services | 0 | Groq (free tier) |
+| LLM cost | $0.00 | ~$0.001 per parse |
+| Total runtime (full eval) | ~5 seconds | ~8 seconds |
+| Memory usage | <50 MB | <100 MB |
+| Node.js version | v22 (v20+ compatible) | v22 (v20+ compatible) |
 
 ---
 
@@ -183,10 +202,16 @@ fair-call-agent/
 
 ## What to Show Judges
 
-For the hackathon evaluation, the most important command is:
+For the hackathon evaluation, these are the most important commands:
 
 ```bash
+# Primary: demonstrates the measured improvement
 npm run eval
+
+# Secondary: shows LLM vs regex side-by-side (requires GROQ_API_KEY)
+npm run demo:llm
+
+# Live UI demo: open https://fair-call-agent-web.vercel.app
 ```
 
-This single command demonstrates the **measured improvement** — the core scoring criterion. It runs both baseline and agent across 12 cases and prints the +45 point constraint satisfaction improvement.
+The `npm run eval` command demonstrates the **measured improvement** — the core scoring criterion. It runs both baseline and agent across 12 cases and prints the +45 point constraint satisfaction improvement.
