@@ -5,103 +5,103 @@
 
 ---
 
-## [0:00 – 0:30] Problem & Baseline
+## [0:00 – 1:00] Origin Story & Problem
 
-**On screen:** Open `fair-call-agent/` in VS Code. Show the project structure briefly.
+**On screen:** Open the live demo at `https://fair-call-agent-web.vercel.app` or `fair-call-agent/` in VS Code.
 
 **Say:**
-> "Shift scheduling sounds simple — just distribute shifts fairly across your team, right? That's exactly what Fair Call Pro does with its LRU algorithm. And it works great... until someone says 'I need time off for my wedding' or 'I can't work weekends.'
+> "I built Fair Call Pro while I was interning as a medical laboratory scientist. We had a real problem — shifts and calls needed to be distributed fairly across the team, and nobody wanted to do it manually. So I wrote a scheduler.
 >
-> The baseline scheduler has no idea how to handle those constraints. It produces mathematically fair schedules that are practically unusable.
+> And it worked. It was actually really effective. But it was also completely deterministic — everyone was treated as interchangeable. The moment someone said 'I need time off for my wedding' or 'I can't work weekends,' the system had no idea what to do. It produced mathematically fair schedules that were practically unusable.
 >
-> We built an agent layer that changes that."
+> I also realized the problem wasn't unique to healthcare — this same scheduling challenge exists in security firms, call centers, retail, hospitality, logistics. The industry doesn't matter; the constraint problem is universal.
+>
+> So I decided to take it further. I built an agentic layer that can understand natural language constraints using an LLM, reason about them, and produce schedules that are fair AND practical."
 
-**Action:** Open `src/lib/baseline-scheduler.ts`. Scroll to show it's a clean, well-structured algorithm. Point out it has no concept of constraints.
+**Action:** Show the project structure briefly — point out the scheduler-lib core and the web UI.
 
 ---
 
-## [0:30 – 2:00] One Realistic Execution
+## [1:00 – 2:30] How It Works — The Agent Layer
 
-**On screen:** Open `src/index.ts` (the demo entry point).
+**On screen:** Open `src/agents/constraint-parser.ts` and `src/agents/enhanced-scheduler.ts`.
 
 **Say:**
-> "Here's how it works. A manager types natural language instructions — no forms, no dropdowns, no constraint builder UI."
+> "Here's the agent system. A manager types instructions in plain English — no forms, no dropdowns, no constraint builder."
 
-**Action:** Show the demo constraints in the code:
+**Action:** Show example constraints:
 ```
 "Ada needs time off from Aug 14 for 3 days"
 "Chidi prefers morning shifts"
 "Kemi cannot work weekends"
+"Bola and Emeka should not work the same shift"
 ```
 
 **Say:**
-> "The Constraint Parser converts these into structured constraint objects — time-off, preference, and availability. No LLM API calls, just pattern matching."
+> "The **Constraint Parser** converts these into structured constraint objects using an LLM — Groq for semantic understanding, with a regex fallback if no API key is configured. It handles 14 constraint types: time-off, availability, shift preferences, inter-staff conflicts, workload limits, and more.
+>
+> Then the **Constraint-Aware Scheduler** wraps the original LRU algorithm. For each shift, it filters out anyone who violates a hard constraint — Ada on her time-off days, Kemi on weekends. Then it scores remaining candidates against soft constraints — Chidi gets bonus points for morning slots."
 
-**Action:** Open `src/agents/constraint-parser.ts`. Briefly show the regex patterns.
-
-**Say:**
-> "Then the Enhanced Scheduler wraps the original LRU algorithm. For each shift slot, it first filters out anyone who would violate a hard constraint — like Ada on her time-off days, or Kemi on weekends. Then it scores remaining candidates with soft constraints — Chidi gets a bonus for morning slots."
-
-**Action:** Open `src/agents/enhanced-scheduler.ts`. Show the `findEligibleStaff` function — point out the hard constraint filtering and soft scoring.
-
-**Say:**
-> "Let's run it."
-
-**Action:** Run `npm run demo` in the terminal. Show the output appearing.
+**Action:** Open `src/agents/enhanced-scheduler.ts`. Point to `findEligibleStaff` — show the hard constraint filtering and soft scoring.
 
 ---
 
-## [2:00 – 3:30] Comparison Results
+## [2:30 – 3:30] Live Demo & Results
 
-**On screen:** Terminal showing the demo output. Then switch to running the full evaluation.
+**On screen:** Run `npm run demo` in the terminal.
 
 **Say:**
-> "That was one case. But we evaluated across 12 realistic scenarios — weddings, understaffed emergencies, hospitals with multiple overlapping constraints, shift preference diversity, and more."
+> "Let's run it with those constraints."
+
+**Action:** Run `npm run demo`. Show the output — the schedule respects all constraints.
+
+**Say:**
+> "That was one case. But we evaluated across 12 realistic scenarios — weddings, understaffed emergencies, hospitals with overlapping constraints, shift preference diversity, and more."
 
 **Action:** Run `npm run eval` in the terminal.
 
 **Say (while results print):**
-> "Here are the results. Coverage stays at 100% — every shift is filled. Fairness is virtually identical at 95.6 versus 95.8. But constraint satisfaction — that's the key metric — jumps from 55% to 100%. That's a 45-point improvement.
->
-> The baseline accidentally satisfies some constraints just because the LRU algorithm distributes evenly. But anything requiring explicit reasoning — time-off requests, weekend unavailability, shift preferences — the baseline completely misses."
+> "Here are the results across all 12 cases. Coverage stays at 100% — every shift is filled. Fairness is virtually identical. But constraint satisfaction jumps from 55% to 100%. That's a 45-point improvement. The baseline accidentally satisfies some constraints by distributing evenly, but anything requiring explicit reasoning — it completely misses."
 
-**Action:** Point at the summary table on screen. Let it linger for a moment.
+**Action:** Point at the summary table. Let it linger.
 
 ---
 
-## [3:30 – 4:30] Changelog Highlights
+## [3:30 – 4:30] Iterative Build
 
-**On screen:** Open `CHANGELOG.md`. Scroll through the 5 iterations.
+**On screen:** Open `CHANGELOG.md`.
 
 **Say:**
-> "We didn't get to 100% in one shot. We built it iteratively, measuring each step:
+> "I didn't get to 100% in one shot. I built it iteratively:
 >
-> **Iteration 1** — We added a natural language parser supporting 14 constraint types. This was the foundation.
+> **Iteration 1** — Natural language parser for 14 constraint types. The foundation.
 >
-> **Iteration 2** — We built the constraint-aware scheduling engine with hard constraint filtering and soft scoring. This alone jumped us from 55% to about 85%.
+> **Iteration 2** — Constraint-aware scheduler with hard filtering and soft scoring. Jumped from 55% to about 85%.
 >
-> **Iteration 3** — We added preference optimization. Staff who prefer certain shifts get scored higher. This brought preference satisfaction from zero to 100%.
+> **Iteration 3** — Preference optimization. Staff who prefer certain shifts get scored higher.
 >
-> **Iteration 4** — We added specific shift pinning. When a manager says 'Ada must work morning on August 5th,' that gets pre-assigned before the main loop.
+> **Iteration 4** — Specific shift pinning. 'Ada must work morning on August 5th' gets pre-assigned.
 >
-> **Iteration 5** — We built the Schedule Explainer — a separate agent that analyzes the output for fairness, constraint compliance, and anomalies. This gives managers transparency into why the schedule looks the way it does."
+> **Iteration 5** — Schedule Explainer agent for transparency — fairness scores, constraint compliance, anomaly detection.
+>
+> **Iteration 6** — LLM integration with Groq. The parser now uses semantic understanding for complex constraints that regex can't handle."
 
-**Action:** Briefly scroll through each iteration in the changelog.
+**Action:** Scroll through the changelog briefly.
 
 ---
 
 ## [4:30 – 5:00] Hot Take & Close
 
-**On screen:** Show the "Hot Take" section from the changelog or the evaluation report.
+**On screen:** Show the "Hot Take" from the evaluation report or changelog.
 
 **Say:**
 > "Here's our hot take. When we honored time-off constraints in an understaffed 4-person team, back-to-back violations actually went up slightly — from 60 to 63. Why? Because removing one person forces the remaining three to work more consecutive days.
 >
-> This reveals something important: constraint satisfaction and individual workload smoothness are sometimes at odds. The agent's job isn't to eliminate all violations — it's to make transparent, principled trade-offs that the baseline algorithm can't even consider.
+> This reveals something important: constraint satisfaction and workload smoothness are sometimes at odds. The agent's job isn't to eliminate all violations — it's to make transparent, principled trade-offs that the baseline can't even consider.
 >
-> That's Fair Call Agent. From 'fair enough' to 'fair for everyone.'"
+> That's Fair Call Agent. From a deterministic tool I built in a lab, to an agentic system that works for any industry. From 'fair enough' to 'fair for everyone.'"
 
-**Action:** Show the final evaluation summary one more time. End on the constraint satisfaction: **55% → 100% [+45]**.
+**Action:** End on the evaluation summary: **Constraint Satisfaction: 55% → 100% [+45]**.
 
 ---
 
